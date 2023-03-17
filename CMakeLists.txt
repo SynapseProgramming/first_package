@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.8)
 project(first_package)
 
 # Default to C99
@@ -21,13 +21,13 @@ find_package(ament_cmake REQUIRED)
 # further dependencies manually.
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED) 
-find_package(first_package REQUIRED) 
 
 #generate the msg/srv header files
 find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Tint.msg"
+  DEPENDENCIES std_msgs 
  )
 
 
@@ -49,7 +49,9 @@ add_executable(pubint src/pub_int.cpp)
 ament_target_dependencies(pubint rclcpp std_msgs)
 
 add_executable(pub_custom_int src/pub_custom_int.cpp)
-ament_target_dependencies(pub_custom_int rclcpp first_package)
+ament_target_dependencies(pub_custom_int rclcpp std_msgs)
+rosidl_get_typesupport_target(cpp_typesupport_target "${PROJECT_NAME}" "rosidl_typesupport_cpp")
+target_link_libraries(pub_custom_int "${cpp_typesupport_target}")
 
 #key in name here, for ro2 to find the executable
 install(TARGETS
@@ -61,6 +63,16 @@ install(TARGETS
   pub_custom_int
   DESTINATION lib/${PROJECT_NAME})
 
-
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  # the following line skips the linter which checks for copyrights
+  # comment the line when a copyright and license is added to all source files
+  set(ament_cmake_copyright_FOUND TRUE)
+  # the following line skips cpplint (only works in a git repo)
+  # comment the line when this package is in a git repo and when
+  # a copyright and license is added to all source files
+  set(ament_cmake_cpplint_FOUND TRUE)
+  ament_lint_auto_find_test_dependencies()
+endif()
 
 ament_package()

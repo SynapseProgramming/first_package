@@ -16,17 +16,17 @@
 #include <chrono>
 #include <memory>
 
-//include of the rclcpp libary, which is the cpp api
+// include of the rclcpp libary, which is the cpp api
 #include "rclcpp/rclcpp.hpp"
-//include of the topic type that we will be publishing.
-//include of msg does not have caps.
+// include of the topic type that we will be publishing.
+// include of msg does not have caps.
 #include "first_package/msg/tint.hpp"
 
 using namespace std::chrono_literals;
-//TODO: figure out more about SharedPtr (https://www.internalpointers.com/post/beginner-s-look-smart-pointers-modern-c)
-//TODO: figure out about bind function as well as the c++ function statement
-//TODO: figure out about lamdas. https://www.variadic.xyz/2011/10/12/c11-lambda-having-fun-with-brackets/#.UJmXu8XA9Z8
-//TODO: test out between calling using lamdas and boost bind.
+// TODO: figure out more about SharedPtr (https://www.internalpointers.com/post/beginner-s-look-smart-pointers-modern-c)
+// TODO: figure out about bind function as well as the c++ function statement
+// TODO: figure out about lamdas. https://www.variadic.xyz/2011/10/12/c11-lambda-having-fun-with-brackets/#.UJmXu8XA9Z8
+// TODO: test out between calling using lamdas and boost bind.
 
 /* This example creates a subclass of Node and uses std::bind() to register a
  * member function as a callback from the timer. */
@@ -36,32 +36,32 @@ class MinimalPublisher : public rclcpp::Node
 public:
   // call node function, to create a new node with the specified name
   MinimalPublisher()
-  : Node("ros_pub_tint")
-  { //initialise publisher pointer, by calling create publisher function which returns a shared ptr of a new publisher object instance
+      : Node("ros_pub_tint")
+  { // initialise publisher pointer, by calling create publisher function which returns a shared ptr of a new publisher object instance
     publisher_ = this->create_publisher<first_package::msg::Tint>("cone", 10);
 
-    //init the timer ptr with a wall timer object.
+    // init the timer ptr with a wall timer object.
 
     timer_ = this->create_wall_timer(
-      500ms, [this](){
+        500ms, [this]()
+        {
         // create string obj.
         auto message = first_package::msg::Tint();
         message.num = this->count;
-        RCLCPP_INFO(this->get_logger(), "Publishing: '%d'", message.num);
+        RCLCPP_INFO(this->get_logger(), "Publishing: '%d'", (int) message.num);
         //publish message
         publisher_->publish(message);
-        this->count++;
-      });
+        this->count++; });
   }
 
 private:
-  int count=0;
-  //shared ptr of a timer
+  int count = 0;
+  // shared ptr of a timer
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Publisher<first_package::msg::Tint>::SharedPtr publisher_;
 };
 
-int main(int argc, char * argv[])
+int main(int argc, char *argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::spin(std::make_shared<MinimalPublisher>());
